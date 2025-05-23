@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:thymeleaf="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
-    <h1>Home.html</h1>
+<th:block th:replace="~{fragments/header}"></th:block>
+<h1>Home.html</h1>
+<th:block th:replace="~{fragments/footer}"></th:block>
 </body>
 </html>
