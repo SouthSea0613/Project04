@@ -16,7 +16,7 @@ $(document).ready(function () {
     const $emailAuthGroup = $('#emailAuthGroup');
     const $emailAuthCodeInput = $('#emailAuthCode');
     const $checkEmailAuthBtn = $('#checkEmailAuthBtn');
-    const $emailAuthHelp = $('#emailAuthHelp');
+    const $emailAuthHelp = $('#emailAuthHelp'); // 이메일 유효성 메시지 표시용
 
     const $phoneNumberInput = $('#phoneNumber');
     const $sendPhoneAuthBtn = $('#sendPhoneAuthBtn');
@@ -28,6 +28,7 @@ $(document).ready(function () {
     const $registerSubmitBtn = $('#registerSubmitBtn');
 
     let isUsernameChecked = false; // 아이디 중복 확인 여부
+    let isEmailFormatValid = false; // 이메일 형식 유효성 상태 변수 추가
     let isEmailVerified = false;   // 이메일 인증 여부
     let isPhoneVerified = false;   // 전화번호 인증 여부
 
@@ -60,6 +61,25 @@ $(document).ready(function () {
             return false;
         }
         $passwordConfirmHelp.text('비밀번호가 일치합니다.').removeClass('text-danger text-muted').addClass('text-success');
+        return true;
+    }
+
+    function validateEmailFormat() {
+        const email = $emailInput.val();
+        // 간단한 이메일 형식 정규식 (최소한 @와 . 포함 여부)
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) { // 이메일이 비어있는 경우
+            $emailAuthHelp.text('이메일을 입력해주세요.').removeClass('text-success text-info').addClass('text-danger');
+            isEmailFormatValid = false;
+            return false;
+        }
+        if (!regex.test(email)) {
+            $emailAuthHelp.text('올바른 이메일 형식이 아닙니다 (예: user@example.com).').removeClass('text-success text-info').addClass('text-danger');
+            isEmailFormatValid = false;
+            return false;
+        }
+        $emailAuthHelp.text('').removeClass('text-danger text-success text-info'); // 유효하면 메시지 초기화
+        isEmailFormatValid = true;
         return true;
     }
 
@@ -103,6 +123,18 @@ $(document).ready(function () {
     }
     if ($passwordConfirmInput.length) {
         $passwordConfirmInput.on('input', validatePasswordConfirm);
+    }
+
+    // 이메일 입력 시 형식 유효성 검사
+    if ($emailInput.length) {
+        $emailInput.on('input', function() {
+            validateEmailFormat();
+            isEmailVerified = false; // 이메일 변경 시 인증 다시 필요
+            // 인증번호 발송 전에는 형식 오류만 표시하거나, "인증번호를 발송해주세요" 등으로 안내
+            if (isEmailFormatValid) {
+                $emailAuthHelp.text('이메일 인증을 진행해주세요.').removeClass('text-danger text-success').addClass('text-info');
+            }
+        });
     }
 
     if ($sendEmailAuthBtn.length) {
@@ -201,47 +233,50 @@ $(document).ready(function () {
     // 폼 제출 이벤트
     if ($registerForm.length) {
         $registerForm.on('submit', function (event) {
-            event.preventDefault(); // 기본 폼 제출 방지
+            event.preventDefault();
 
-            // 모든 유효성 검사 및 인증 확인
             const isUsernameValid = validateUsername();
             const isPasswordValid = validatePassword();
             const isPasswordConfirmValid = validatePasswordConfirm();
+            const isEmailFormatCurrentlyValid = validateEmailFormat(); // 제출 시점에서도 이메일 형식 확인
 
-            if (!isUsernameValid || !isPasswordValid || !isPasswordConfirmValid) {
+            if (!isUsernameValid || !isPasswordValid || !isPasswordConfirmValid || !isEmailFormatCurrentlyValid) {
                 alert('입력 정보를 다시 확인해주세요.');
+                // 어느 필드가 잘못되었는지 포커스를 줄 수도 있음
+                if (!isUsernameValid) $usernameInput.focus();
+                else if (!isPasswordValid) $passwordInput.focus();
+                else if (!isPasswordConfirmValid) $passwordConfirmInput.focus();
+                else if (!isEmailFormatCurrentlyValid) $emailInput.focus();
                 return;
             }
             if (!isUsernameChecked) {
                 alert('아이디 중복 확인을 해주세요.');
-                $usernameInput.trigger('focus'); // jQuery focus() 대신 trigger('focus') 사용 가능
+                $usernameInput.focus();
                 return;
             }
-            // TODO: 이메일, 전화번호 필수 여부에 따라 isEmailVerified, isPhoneVerified 조건 추가
+            // 이메일 인증을 필수로 할 경우 isEmailVerified 확인
             // if (!isEmailVerified) {
             //     alert('이메일 인증을 완료해주세요.');
-            //     $emailAuthCodeInput.trigger('focus');
+            //     $emailAuthCodeInput.focus();
             //     return;
             // }
+            // 전화번호 인증을 필수로 할 경우 isPhoneVerified 확인
             // if (!isPhoneVerified) {
             //     alert('전화번호 인증을 완료해주세요.');
-            //     $phoneAuthCodeInput.trigger('focus');
+            //     $phoneAuthCodeInput.focus();
             //     return;
             // }
 
-            // 모든 검증 통과 시 폼 데이터 제출
-            const formData = $(this).serializeArray(); // 폼 데이터를 배열로 직렬화
-            const data = {};
-            $.each(formData, function(i, field){
-                data[field.name] = field.value;
-            });
+
+            const formData = new FormData(this); // 'this'는 폼 엘리먼트
+            const data = Object.fromEntries(formData.entries());
             console.log('제출할 데이터:', data);
 
             // TODO: 실제 백엔드 회원가입 API 호출 (axios 사용)
-            axios.post('/api/auth/register', data) // 백엔드 API 엔드포인트
+            axios.post('/api/auth/register', data)
                 .then(function (response) {
                     alert('회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.');
-                    window.location.href = '/auth/login'; // 로그인 페이지로 리디렉션
+                    window.location.href = '/auth/login';
                 })
                 .catch(function (error) {
                     console.error('회원가입 오류:', error);
@@ -259,47 +294,23 @@ $(document).ready(function () {
 function execDaumPostcode() {
     new daum.Postcode({
         oncomplete: function(data) {
-            // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+            $('#postcode').val(data.zonecode);
+            $('#address').val((data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress));
+            $('#detailAddress').focus();
 
-            // 각 주소의 노출 규칙에 따라 주소를 조합한다.
-            // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
-            var addr = ''; // 주소 변수
-            var extraAddr = ''; // 참고항목 변수
-
-            //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
-            if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
-                addr = data.roadAddress;
-            } else { // 사용자가 지번 주소를 선택했을 경우(J)
-                addr = data.jibunAddress;
-            }
-
-            // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
-            if(data.userSelectedType === 'R'){
-                // 법정동명이 있을 경우 추가한다. (법정리는 제외)
-                // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
-                if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+            var extraAddr = '';
+            if (data.userSelectedType === 'R') {
+                if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
                     extraAddr += data.bname;
                 }
-                // 건물명이 있고, 공동주택일 경우 추가한다.
-                if(data.buildingName !== '' && data.apartment === 'Y'){
+                if (data.buildingName !== '' && data.apartment === 'Y') {
                     extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
                 }
-                // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
-                if(extraAddr !== ''){
+                if (extraAddr !== '') {
                     extraAddr = ' (' + extraAddr + ')';
                 }
-                // 조합된 참고항목을 해당 필드에 넣는다.
-                document.getElementById("extraAddress").value = extraAddr;
-
-            } else {
-                document.getElementById("extraAddress").value = '';
             }
-
-            // 우편번호와 주소 정보를 해당 필드에 넣는다.
-            document.getElementById('postcode').value = data.zonecode;
-            document.getElementById("address").value = addr;
-            // 커서를 상세주소 필드로 이동한다.
-            document.getElementById("detailAddress").focus();
+            $('#extraAddress').val(extraAddr);
         }
     }).open();
 }
