@@ -5,7 +5,7 @@
 }
 
 .slider-container {
-    max-width: 100%;
+    max-width: 90%;
     margin: 0 auto;
     position: relative;
     overflow: hidden; /* 슬라이드가 이동할 때 컨테이너 밖으로 나가는 부분을 숨김 */
@@ -15,7 +15,13 @@
 .slider-aspect-ratio-keeper {
     position: relative;
     width: 100%;
-    padding-top: 56.25%; /* 16:9 비율 */
+    /* 기존 16:9 (56.25%) 보다 작은 값으로 설정하여 높이를 줄임 */
+    /* 예시: 약 18:9 또는 2:1 비율에 가깝게 (높이를 더 낮춤) */
+    padding-top: 56.25%; /* 이 값을 조절하여 높이를 변경 (예: 50%, 45% 등) */
+    /* 56.25% -> 16:9 */
+    /* 50%    -> 2:1   */
+    /* 40%    -> 2.5:1 */
+    background-color: #e0e0e0; /* 이미지 로딩 전 배경색 */
 }
 
 .slides {
@@ -35,6 +41,19 @@
     height: 100%;
     flex-shrink: 0; /* 슬라이드 너비가 줄어들지 않도록 보장 */
     overflow: hidden; /* 이미지가 슬라이드 영역을 벗어나지 않도록 */
+}
+
+.slide a {
+    display: block; /* a 태그가 슬라이드 전체 영역을 차지하도록 */
+    width: 100%;
+    height: 100%;
+    text-decoration: none; /* 링크 밑줄 제거 */
+    color: inherit; /* 부모 요소의 색상 상속 (이미지에는 영향 없음) */
+}
+
+.slide a:focus,
+.slide a:active {
+    outline: none; /* 포커스 시 아웃라인 제거 (접근성 고려 시 신중히 결정) */
 }
 
 .slide.active {

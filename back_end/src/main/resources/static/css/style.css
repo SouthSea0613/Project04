@@ -67,9 +67,34 @@ header {
     background-color: var(--color-header-bg);
     padding: 20px 0; /* 상하 패딩 증가 */
     border-bottom: 1px solid var(--color-border);
+    transition: padding 0.3s ease-in-out, background-color 0.3s ease-in-out; /* 부드러운 전환 효과 */
     position: sticky;
     top: 0;
     z-index: 1000;
+}
+
+/* 헤더 축소 시 스타일 */
+header.scrolled {
+    padding: 5px 0; /* 상하 패딩 축소 */
+    background-color: rgba(255, 248, 220, 0.95); /* 배경색 살짝 투명하게 변경 (콘실크 기반) */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* 약간의 그림자 효과 */
+}
+
+header.scrolled .header-top {
+    margin-bottom: 5px; /* 로고와 하단 메뉴 사이 간격 축소 */
+}
+
+header.scrolled .header-logo-img {
+    height: 25px; /* 로고 이미지 높이 축소 */
+    /* transition 효과는 이미 header에 적용되어 자식에게도 영향 줄 수 있지만,
+       개별적으로 주고 싶다면 추가: transition: height 0.3s ease-in-out; */
+}
+
+header.scrolled .main-menu nav ul li a,
+header.scrolled .user-menu nav ul li a,
+header.scrolled .user-menu nav ul li span,
+header.scrolled .user-menu nav ul li form button {
+    font-size: 0.9em; /* 메뉴 폰트 크기 약간 축소 (선택 사항) */
 }
 
 .header-logo-img {
@@ -179,46 +204,4 @@ footer .container a {
 }
 footer .container a:hover {
     color: var(--color-accent);
-}
-
-/* 반응형 처리: 모바일 화면 */
-@media (max-width: 768px) {
-    .header-logo-img {
-        height: 25px; /* 모바일에서 로고 높이 더 작게 (선택 사항) */
-    }
-
-    .header-top .logo a {
-        font-size: 1.8em;
-    }
-
-    .header-bottom {
-        flex-direction: column; /* 모바일에서 메인 메뉴와 사용자 메뉴를 세로로 */
-        align-items: flex-start; /* 왼쪽 정렬 */
-    }
-
-    .main-menu nav {
-        width: 100%;
-        margin-bottom: 10px; /* 메인 메뉴와 사용자 메뉴 사이 간격 */
-    }
-
-    .main-menu nav ul,
-    .user-menu nav ul {
-        flex-direction: column;
-        align-items: flex-start;
-        width: 100%;
-    }
-
-    .main-menu nav ul li,
-    .user-menu nav ul li {
-        margin: 8px 0; /* 모바일에서 메뉴 아이템 간격 */
-        width: 100%;
-    }
-
-    .main-menu nav ul li a,
-    .user-menu nav ul li a,
-    .user-menu nav ul li span,
-    .user-menu nav ul li form button {
-        display: block; /* 링크/버튼 영역 확장 */
-        padding: 5px 0;
-    }
 }
