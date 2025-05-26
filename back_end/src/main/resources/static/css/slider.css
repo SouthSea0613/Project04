@@ -1,0 +1,147 @@
+/* slider.css */
+.slider-section {
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.slider-container {
+    max-width: 100%;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden; /* 슬라이드가 이동할 때 컨테이너 밖으로 나가는 부분을 숨김 */
+    background-color: #e0e0e0; /* 이미지 로딩 전 배경색 */
+}
+
+.slider-aspect-ratio-keeper {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 비율 */
+}
+
+.slides {
+    display: flex;
+    /* .slider-aspect-ratio-keeper 내부에 절대 위치로 배치되어 전체를 채움 */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%; /* JavaScript에서 (totalSlides * 100%)로 설정될 것임 */
+    height: 100%;
+    transition: transform 0.7s ease-in-out;
+}
+
+.slide {
+    /* 각 슬라이드는 .slides 컨테이너 너비의 (100 / totalSlides)% 만큼 차지 */
+    /* width는 JavaScript에서 설정될 것임 */
+    height: 100%;
+    flex-shrink: 0; /* 슬라이드 너비가 줄어들지 않도록 보장 */
+    overflow: hidden; /* 이미지가 슬라이드 영역을 벗어나지 않도록 */
+}
+
+.slide.active {
+    /* opacity: 1; */
+    /* visibility: visible; */
+    display: block; /* 활성 슬라이드만 표시 */
+    z-index: 1; /* 다른 슬라이드 위에 표시 */
+}
+
+.slide img {
+    width: 100%; /* .slide 요소의 너비에 100% 맞춤 */
+    height: 100%; /* .slide 요소의 높이에 100% 맞춤 */
+    object-fit: cover; /* 중요: 비율을 유지하면서 .slide 영역을 꽉 채움 (이미지가 잘릴 수 있음) */
+    /* 또는 object-fit: contain; */ /* 비율을 유지하면서 이미지가 .slide 영역 안에 모두 보이도록 (빈 공간이 생길 수 있음) */
+    display: block; /* 이미지 하단 여백 제거 */
+}
+
+/* 좌/우 화살표 버튼 */
+.slide-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.3); /* 반투명 배경 */
+    color: white;
+    border: none;
+    font-size: 28px; /* 아이콘 크기 */
+    padding: 10px;
+    cursor: pointer;
+    z-index: 10; /* 다른 요소들 위에 표시 */
+    border-radius: 50%; /* 원형 버튼 */
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.slide-arrow:hover {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.prev-arrow {
+    left: 20px;
+}
+
+.next-arrow {
+    right: 20px;
+}
+
+/* 인디케이터 */
+.slide-indicators {
+    position: absolute;
+    bottom: 20px; /* 하단에서의 위치 */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px; /* 인디케이터 사이 간격 */
+    z-index: 10;
+}
+
+.indicator-dot {
+    width: 8px;  /* 너비 작게 조정 */
+    height: 8px; /* 높이 작게 조정 */
+    background-color: rgba(255, 255, 255, 0.4); /* 비활성 인디케이터 색상 (더 연하게) */
+    border-radius: 50%; /* 완벽한 원 모양 */
+    cursor: pointer;
+    border: none; /* 테두리 제거 또는 아주 얇게 설정 */
+    /* border: 1px solid rgba(0, 0, 0, 0.1); */ /* 매우 연한 테두리 (선택 사항) */
+    padding: 0; /* 내부 패딩 제거 */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.indicator-dot.active {
+    background-color: rgba(255, 255, 255, 0.9); /* 활성 인디케이터 색상 (살짝 투명도 있게) */
+    /* 활성 인디케이터 크기 변경은 유지하거나, 제거하거나, 더 미세하게 조정 가능 */
+    /* transform: scale(1.1); */
+}
+
+.slide-indicators {
+    position: absolute;
+    bottom: 15px; /* 하단에서의 위치 살짝 조정 (선택 사항) */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px; /* 인디케이터 사이 간격 살짝 줄임 (선택 사항) */
+    z-index: 10;
+}
+
+/* 모바일 화면에서의 화살표 크기 조정 (선택 사항) */
+@media (max-width: 768px) {
+    .slide-arrow {
+        font-size: 20px;
+        width: 40px;
+        height: 40px;
+        padding: 8px;
+        left: 10px;
+    }
+    .next-arrow {
+        right: 10px;
+    }
+    .slide-indicators {
+        bottom: 8px; /* 모바일에서 하단 간격 더 줄임 */
+        gap: 6px;
+    }
+    .indicator-dot {
+        width: 6px; /* 모바일에서 더 작게 */
+        height: 6px;
+    }
+}

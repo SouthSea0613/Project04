@@ -3,20 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>메인 페이지 | MyProject</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"> </head>
+    <title>메인 페이지 | 인테리어 플랫폼</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"> <link rel="stylesheet" th:href="@{/css/slider.css}"> </head>
 <body>
 <div th:replace="~{fragments/header :: commonHeader}"></div>
 
 <main>
-    <div class="container">
-        <h1>환영합니다!</h1>
-        <p>이곳은 메인 페이지의 콘텐츠 영역입니다.</p>
-        <p>프로젝트에 대한 설명을 작성하거나, 주요 기능으로 안내하는 링크를 넣을 수 있습니다.</p>
+    <section class="slider-section">
+        <div class="slider-container">
+            <div class="slider-aspect-ratio-keeper">
+                <div class="slides">
+                </div>
+            </div>
+            <button class="slide-arrow prev-arrow" aria-label="이전 슬라이드">&#10094;</button>
+            <button class="slide-arrow next-arrow" aria-label="다음 슬라이드">&#10095;</button>
+            <div class="slide-indicators">
+            </div>
+        </div>
+    </section>
+    <div class="container page-content"> <h1>인테리어 영감을 찾으세요</h1>
+        <p>다양한 인테리어 스타일과 전문가의 포트폴리오를 탐색하고, 여러분만의 공간을 만들어보세요.</p>
     </div>
 </main>
 
 <div th:replace="~{fragments/footer :: commonFooter}"></div>
 
-</body>
+<script th:src="@{/js/slider.js}"></script> </body>
 </html>
