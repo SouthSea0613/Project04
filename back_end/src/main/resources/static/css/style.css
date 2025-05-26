@@ -1,143 +1,213 @@
-/* 기본 스타일 및 반응형 레이아웃 */
+/* Noto Sans KR 폰트 CDN (선택 사항, 한글 폰트 개선) */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+/* 기본 색상 팔레트 (베이지 파스텔톤) */
+:root {
+    --color-primary-bg: #F5F5DC; /* 매우 연한 베이지 (배경) */
+    --color-secondary-bg: #FAF0E6; /* 리넨, 약간 더 따뜻한 베이지 (보조 배경) */
+    --color-header-bg: #FFF8DC; /* 콘실크, 헤더 배경 */
+    --color-footer-bg: #E0D8C0; /* 약간 어두운 베이지 (푸터 배경) */
+    --color-text-primary: #5D534A; /* 어두운 갈색 계열 (주 텍스트) */
+    --color-text-secondary: #7A7067; /* 중간 갈색 계열 (보조 텍스트) */
+    --color-accent: #D2B48C; /* 탠, 강조색 (링크, 버튼 등) */
+    --color-accent-hover: #C1A075; /* 강조색 호버 */
+    --color-border: #DCDCDC; /* 연한 회색 또는 베이지 계열 테두리 */
+    --font-family-base: 'Noto Sans KR', sans-serif; /* 기본 폰트 */
+}
+
+/* 기본 스타일 */
 body {
-    font-family: sans-serif;
+    font-family: var(--font-family-base);
     margin: 0;
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* 전체 화면 높이 */
-    color: #333;
+    min-height: 100vh;
+    background-color: var(--color-primary-bg);
+    color: var(--color-text-primary);
+    line-height: 1.6;
 }
 
 .container {
     width: 90%;
-    max-width: 1200px; /* 최대 너비 설정 */
-    margin: 0 auto; /* 중앙 정렬 */
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 20px;
 }
 
-/* Header 스타일 */
+/* 링크 스타일 */
+a {
+    color: var(--color-accent);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--color-accent-hover);
+    text-decoration: underline;
+}
+
+/* 버튼 스타일 (기본) */
+button, input[type="submit"], input[type="button"] {
+    background-color: var(--color-accent);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: var(--font-family-base);
+    transition: background-color 0.3s ease;
+}
+
+button:hover, input[type="submit"]:hover, input[type="button"]:hover {
+    background-color: var(--color-accent-hover);
+}
+
+
+/* Header 스타일 수정 */
 header {
-    background-color: #f8f9fa;
-    padding: 15px 0;
-    border-bottom: 1px solid #e7e7e7;
-    position: sticky; /* 스크롤 시 상단 고정 (선택 사항) */
+    background-color: var(--color-header-bg);
+    padding: 20px 0; /* 상하 패딩 증가 */
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
     top: 0;
     z-index: 1000;
 }
 
 header .container {
     display: flex;
-    justify-content: space-between; /* 좌우 정렬 */
+    flex-direction: column; /* 타이틀과 네비게이션 바를 세로로 배치 */
+    align-items: flex-start; /* 왼쪽 정렬 */
+}
+
+.header-top {
+    width: 100%;
+    margin-bottom: 15px; /* 타이틀과 네비게이션 바 사이 간격 */
+}
+
+.header-top .logo a {
+    font-size: 2em; /* 타이틀 크기 증가 */
+    font-weight: bold;
+    color: var(--color-text-primary);
+}
+
+.header-bottom {
+    width: 100%;
+    display: flex;
+    justify-content: space-between; /* 메인 메뉴와 사용자 메뉴를 양 끝으로 */
     align-items: center;
 }
 
-header .logo a {
-    font-size: 1.5em;
-    font-weight: bold;
-    text-decoration: none;
-    color: #333;
-}
-
-header nav ul {
+.main-menu nav ul,
+.user-menu nav ul {
     list-style: none;
     padding: 0;
     margin: 0;
-    display: flex;
-}
-
-header nav ul li {
-    margin-left: 20px;
-}
-
-header nav ul li a {
-    text-decoration: none;
-    color: #007bff;
-}
-
-header nav ul li a:hover {
-    text-decoration: underline;
-}
-
-/* 메인 메뉴 (좌측) */
-.main-menu {
     display: flex;
     align-items: center;
 }
 
 .main-menu nav ul li {
-    margin-right: 20px; /* 메뉴 간 간격 */
-    margin-left: 0;
+    margin-right: 25px; /* 메인 메뉴 간 간격 */
 }
 
-
-/* 사용자 메뉴 (우측) */
-.user-menu ul li {
-    margin-left: 15px;
+.user-menu nav ul li {
+    margin-left: 20px; /* 사용자 메뉴 간 간격 */
 }
+
+.main-menu nav ul li a,
+.user-menu nav ul li a,
+.user-menu nav ul li span {
+    color: var(--color-text-secondary);
+    font-size: 0.95em;
+}
+
+.main-menu nav ul li a:hover,
+.user-menu nav ul li a:hover {
+    color: var(--color-accent);
+    text-decoration: none; /* 밑줄 제거, 호버 시 색상 변경으로 강조 */
+}
+
+.user-menu nav ul li form button { /* 로그아웃 버튼 스타일 */
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-size: 0.95em;
+    font-family: var(--font-family-base);
+}
+
+.user-menu nav ul li form button:hover {
+    color: var(--color-accent);
+}
+
 
 /* Main content 스타일 */
 main {
-    flex-grow: 1; /* 푸터를 하단에 고정시키기 위해 main이 남은 공간을 모두 차지 */
-    padding: 20px 0;
+    flex-grow: 1;
+    padding: 30px 0; /* 메인 콘텐츠 패딩 증가 */
+    background-color: var(--color-secondary-bg); /* 메인 콘텐츠 영역 배경색 */
+}
+
+main .container h1 {
+    color: var(--color-text-primary);
+    margin-bottom: 20px;
 }
 
 /* Footer 스타일 */
 footer {
-    background-color: #343a40;
-    color: #fff;
-    padding: 20px 0;
+    background-color: var(--color-footer-bg);
+    color: var(--color-text-secondary);
+    padding: 30px 0; /* 푸터 패딩 증가 */
     text-align: center;
     font-size: 0.9em;
+    border-top: 1px solid var(--color-border);
 }
 
 footer .container p {
-    margin: 5px 0;
+    margin: 8px 0; /* 푸터 내부 p 태그 간격 */
 }
 
 footer .container a {
-    color: #007bff;
-    text-decoration: none;
+    color: var(--color-text-primary); /* 푸터 내 링크 색상 */
 }
 footer .container a:hover {
-    text-decoration: underline;
+    color: var(--color-accent);
 }
-
 
 /* 반응형 처리: 모바일 화면 */
 @media (max-width: 768px) {
-    header .container {
-        flex-direction: column; /* 헤더 요소들을 세로로 정렬 */
-        align-items: flex-start;
+    .header-top .logo a {
+        font-size: 1.8em;
     }
 
-    header nav {
-        width: 100%;
-        margin-top: 10px;
+    .header-bottom {
+        flex-direction: column; /* 모바일에서 메인 메뉴와 사용자 메뉴를 세로로 */
+        align-items: flex-start; /* 왼쪽 정렬 */
     }
 
-    header nav ul {
-        flex-direction: column; /* 모바일에서 메뉴를 세로로 */
+    .main-menu nav {
         width: 100%;
+        margin-bottom: 10px; /* 메인 메뉴와 사용자 메뉴 사이 간격 */
     }
 
-    header nav ul li {
-        margin: 5px 0;
-        text-align: left;
-        padding: 5px 0;
-        border-bottom: 1px dotted #eee; /* 구분선 */
-    }
-    header nav ul li:last-child {
-        border-bottom: none;
-    }
-
-    .main-menu {
-        width: 100%;
-    }
-    .user-menu {
-        width: 100%;
-        margin-top: 10px;
-    }
+    .main-menu nav ul,
     .user-menu nav ul {
-        align-items: flex-start; /* 모바일에서 사용자 메뉴도 왼쪽 정렬 */
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    .main-menu nav ul li,
+    .user-menu nav ul li {
+        margin: 8px 0; /* 모바일에서 메뉴 아이템 간격 */
+        width: 100%;
+    }
+
+    .main-menu nav ul li a,
+    .user-menu nav ul li a,
+    .user-menu nav ul li span,
+    .user-menu nav ul li form button {
+        display: block; /* 링크/버튼 영역 확장 */
+        padding: 5px 0;
     }
 }
