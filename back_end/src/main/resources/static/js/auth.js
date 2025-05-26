@@ -13,24 +13,27 @@ $(document).ready(function () {
 
     const $emailInput = $('#email');
     const $sendEmailAuthBtn = $('#sendEmailAuthBtn');
-    const $emailAuthGroup = $('#emailAuthGroup');
+    const $emailAuthGroup = $('#emailAuthGroup'); // 이메일 인증번호 입력 그룹
     const $emailAuthCodeInput = $('#emailAuthCode');
     const $checkEmailAuthBtn = $('#checkEmailAuthBtn');
-    const $emailAuthHelp = $('#emailAuthHelp'); // 이메일 유효성 메시지 표시용
+    const $emailFormatHelp = $('#emailFormatHelp'); // HTML에 이 ID로 <small> 태그가 있다고 가정
+    const $emailAuthCodeHelp = $('#emailAuthCodeHelp'); // HTML에 이 ID로 <small> 태그가 있다고 가정
 
     const $phoneNumberInput = $('#phoneNumber');
     const $sendPhoneAuthBtn = $('#sendPhoneAuthBtn');
-    const $phoneAuthGroup = $('#phoneAuthGroup');
+    const $phoneAuthGroup = $('#phoneAuthGroup'); // 전화번호 인증번호 입력 그룹
     const $phoneAuthCodeInput = $('#phoneAuthCode');
     const $checkPhoneAuthBtn = $('#checkPhoneAuthBtn');
-    const $phoneAuthHelp = $('#phoneAuthHelp');
+    const $phoneHelp = $('#phoneHelp'); // 전화번호 유효성 메시지 표시용 (HTML에 새로 추가 필요 가정)
 
     const $registerSubmitBtn = $('#registerSubmitBtn');
 
-    let isUsernameChecked = false; // 아이디 중복 확인 여부
-    let isEmailFormatValid = false; // 이메일 형식 유효성 상태 변수 추가
-    let isEmailVerified = false;   // 이메일 인증 여부
-    let isPhoneVerified = false;   // 전화번호 인증 여부
+    let isUsernameChecked = false;
+    let isEmailFormatValid = false;
+    let isEmailVerified = false;
+    let isPhoneNumberValid = false; // 전화번호 유효성 상태 변수 추가
+    let isPhoneVerified = false;
+
 
     // --- 유효성 검사 함수 ---
     function validateUsername() {
@@ -40,7 +43,8 @@ $(document).ready(function () {
             $usernameHelp.text('아이디는 영문 또는 숫자로 5~20자여야 합니다.').removeClass('text-success text-muted').addClass('text-danger');
             return false;
         }
-        $usernameHelp.text('').removeClass('text-danger text-success').addClass('text-muted');
+        // 중복 확인 전까지는 특정 메시지 유지 또는 초기화
+        // $usernameHelp.text('').removeClass('text-danger text-success').addClass('text-muted');
         return true;
     }
 
@@ -66,26 +70,45 @@ $(document).ready(function () {
 
     function validateEmailFormat() {
         const email = $emailInput.val();
-        // 간단한 이메일 형식 정규식 (최소한 @와 . 포함 여부)
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email) { // 이메일이 비어있는 경우
-            $emailAuthHelp.text('이메일을 입력해주세요.').removeClass('text-success text-info').addClass('text-danger');
+        if (!email) {
+            if ($emailFormatHelp.length) $emailFormatHelp.text('이메일을 입력해주세요.').removeClass('text-success text-info').addClass('text-danger');
             isEmailFormatValid = false;
             return false;
         }
         if (!regex.test(email)) {
-            $emailAuthHelp.text('올바른 이메일 형식이 아닙니다 (예: user@example.com).').removeClass('text-success text-info').addClass('text-danger');
+            if ($emailFormatHelp.length) $emailFormatHelp.text('올바른 이메일 형식이 아닙니다 (예: user@example.com).').removeClass('text-success text-info').addClass('text-danger');
             isEmailFormatValid = false;
             return false;
         }
-        $emailAuthHelp.text('').removeClass('text-danger text-success text-info'); // 유효하면 메시지 초기화
+        if ($emailFormatHelp.length) $emailFormatHelp.text('').removeClass('text-danger text-success text-info');
         isEmailFormatValid = true;
+        return true;
+    }
+
+    // 전화번호 유효성 검사 함수 추가
+    function validatePhoneNumber() {
+        const phoneNumber = $phoneNumberInput.val();
+        // 예: 숫자만 10~11자리 (하이픈 없이)
+        const regex = /^[0-9]{10,11}$/;
+        if (!phoneNumber) {
+            if ($phoneHelp.length) $phoneHelp.text('전화번호를 입력해주세요.').removeClass('text-success text-info').addClass('text-danger');
+            isPhoneNumberValid = false;
+            return false;
+        }
+        if (!regex.test(phoneNumber)) {
+            if ($phoneHelp.length) $phoneHelp.text('올바른 전화번호 형식이 아닙니다 (숫자만 10~11자리).').removeClass('text-success text-info').addClass('text-danger');
+            isPhoneNumberValid = false;
+            return false;
+        }
+        if ($phoneHelp.length) $phoneHelp.text('').removeClass('text-danger text-success text-info');
+        isPhoneNumberValid = true;
         return true;
     }
 
     // --- 이벤트 리스너 ---
     if ($usernameInput.length) {
-        $usernameInput.on('input', function() {
+        $usernameInput.on('input', function () {
             validateUsername();
             isUsernameChecked = false;
             $usernameHelp.text('아이디 중복 확인을 해주세요.').removeClass('text-success text-muted').addClass('text-danger');
@@ -94,7 +117,10 @@ $(document).ready(function () {
 
     if ($checkUsernameBtn.length) {
         $checkUsernameBtn.on('click', async function () {
-            if (!validateUsername()) return;
+            if (!validateUsername()) {
+                $usernameInput.focus();
+                return;
+            }
             const username = $usernameInput.val();
             try {
                 // TODO: 실제 백엔드 아이디 중복 확인 API 호출 (axios 사용)
@@ -106,10 +132,9 @@ $(document).ready(function () {
                 //     $usernameHelp.text('이미 사용 중인 아이디입니다.').removeClass('text-success text-muted').addClass('text-danger');
                 //     isUsernameChecked = false;
                 // }
-                // 임시 코드
                 $usernameHelp.text('사용 가능한 아이디입니다. (임시)').removeClass('text-danger text-muted').addClass('text-success');
                 isUsernameChecked = true;
-                alert('아이디 중복 확인 (임시): 사용 가능');
+                // alert('아이디 중복 확인 (임시): 사용 가능'); // 실제 서비스에서는 alert 제거
             } catch (error) {
                 console.error('아이디 중복 확인 오류:', error);
                 $usernameHelp.text('중복 확인 중 오류가 발생했습니다.').removeClass('text-success text-muted').addClass('text-danger');
@@ -125,107 +150,119 @@ $(document).ready(function () {
         $passwordConfirmInput.on('input', validatePasswordConfirm);
     }
 
-    // 이메일 입력 시 형식 유효성 검사
     if ($emailInput.length) {
-        $emailInput.on('input', function() {
+        $emailInput.on('input', function () {
             validateEmailFormat();
-            isEmailVerified = false; // 이메일 변경 시 인증 다시 필요
-            // 인증번호 발송 전에는 형식 오류만 표시하거나, "인증번호를 발송해주세요" 등으로 안내
+            isEmailVerified = false;
             if (isEmailFormatValid) {
-                $emailAuthHelp.text('이메일 인증을 진행해주세요.').removeClass('text-danger text-success').addClass('text-info');
+                if ($emailFormatHelp.length) $emailFormatHelp.text('이메일 인증을 진행해주세요.').removeClass('text-danger text-success').addClass('text-info');
+            }
+            // 인증번호 입력 필드가 이미 보이고 있다면, 이메일 변경 시 관련 메시지 초기화
+            if ($emailAuthGroup.is(':visible') && $emailAuthCodeHelp.length) {
+                $emailAuthCodeHelp.text('');
             }
         });
     }
 
     if ($sendEmailAuthBtn.length) {
-        $sendEmailAuthBtn.on('click', async function() {
-            const email = $emailInput.val();
-            if (!email) { // 간단한 이메일 존재 여부 확인
-                alert('이메일을 입력해주세요.');
+        $sendEmailAuthBtn.on('click', async function () {
+            if (!validateEmailFormat()) {
+                $emailInput.focus();
                 return;
             }
-            // TODO: 더 엄격한 이메일 형식 유효성 검사 추가 가능
+            const email = $emailInput.val();
             try {
                 // TODO: 실제 백엔드 이메일 인증번호 발송 API 호출
-                // await axios.post('/api/auth/send-email-verification', { email: email });
                 $emailAuthGroup.show();
-                $emailAuthHelp.text('인증번호가 발송되었습니다. 이메일을 확인해주세요. (임시)').removeClass('text-danger text-success').addClass('text-info');
-                alert('이메일 인증번호 발송 (임시)');
+                if ($emailAuthCodeHelp.length) $emailAuthCodeHelp.text('인증번호가 발송되었습니다. 이메일을 확인해주세요. (임시)').removeClass('text-danger text-success').addClass('text-info');
+                // alert('이메일 인증번호 발송 (임시)');
             } catch (error) {
                 console.error('이메일 인증번호 발송 오류:', error);
-                $emailAuthHelp.text('인증번호 발송 중 오류가 발생했습니다.').removeClass('text-info text-success').addClass('text-danger');
+                if ($emailAuthCodeHelp.length) $emailAuthCodeHelp.text('인증번호 발송 중 오류가 발생했습니다.').removeClass('text-info text-success').addClass('text-danger');
             }
         });
     }
 
     if ($checkEmailAuthBtn.length) {
-        $checkEmailAuthBtn.on('click', async function() {
+        $checkEmailAuthBtn.on('click', async function () {
             const email = $emailInput.val();
             const code = $emailAuthCodeInput.val();
             if (!code) {
-                alert('인증번호를 입력해주세요.');
+                // alert('인증번호를 입력해주세요.');
+                if ($emailAuthCodeHelp.length) $emailAuthCodeHelp.text('인증번호를 입력해주세요.').removeClass('text-info text-success').addClass('text-danger');
+                $emailAuthCodeInput.focus();
                 return;
             }
             try {
                 // TODO: 실제 백엔드 이메일 인증번호 확인 API 호출
-                // const response = await axios.post('/api/auth/verify-email-code', { email: email, code: code });
-                // if (response.data.isVerified) {
-                //     $emailAuthHelp.text('이메일 인증이 완료되었습니다.').removeClass('text-danger text-info').addClass('text-success');
-                //     isEmailVerified = true;
-                //     $sendEmailAuthBtn.prop('disabled', true);
-                //     $checkEmailAuthBtn.prop('disabled', true);
-                //     $emailInput.prop('readonly', true);
-                // } else {
-                //     $emailAuthHelp.text('인증번호가 올바르지 않습니다.').removeClass('text-success text-info').addClass('text-danger');
-                // }
-                // 임시 코드
-                $emailAuthHelp.text('이메일 인증이 완료되었습니다. (임시)').removeClass('text-danger text-info').addClass('text-success');
+                if ($emailAuthCodeHelp.length) $emailAuthCodeHelp.text('이메일 인증이 완료되었습니다. (임시)').removeClass('text-danger text-info').addClass('text-success');
                 isEmailVerified = true;
-                alert('이메일 인증 확인 (임시): 성공');
+                $sendEmailAuthBtn.prop('disabled', true);
+                $checkEmailAuthBtn.prop('disabled', true);
+                $emailInput.prop('readonly', true);
+                // alert('이메일 인증 확인 (임시): 성공');
             } catch (error) {
                 console.error('이메일 인증 확인 오류:', error);
-                $emailAuthHelp.text('인증 확인 중 오류가 발생했습니다.').removeClass('text-success text-info').addClass('text-danger');
+                if ($emailAuthCodeHelp.length) $emailAuthCodeHelp.text('인증 확인 중 오류가 발생했습니다.').removeClass('text-info text-success').addClass('text-danger');
+            }
+        });
+    }
+
+    // 전화번호 입력 시 형식 유효성 검사
+    if ($phoneNumberInput.length) {
+        $phoneNumberInput.on('input', function () {
+            validatePhoneNumber();
+            isPhoneVerified = false; // 전화번호 변경 시 인증 다시 필요
+            if (isPhoneNumberValid) {
+                if ($phoneHelp.length) $phoneHelp.text('전화번호 인증을 진행해주세요.').removeClass('text-danger text-success').addClass('text-info');
+            }
+            // 인증번호 입력 필드가 이미 보이고 있다면, 전화번호 변경 시 관련 메시지 초기화
+            if ($phoneAuthGroup.is(':visible') && $phoneHelp.length) { // phoneAuthHelp이 아니라 phoneHelp이 맞음
+                // $phoneAuthHelp.text(''); // 이 부분은 phoneAuthCodeHelp에 해당
             }
         });
     }
 
     if ($sendPhoneAuthBtn.length) {
-        $sendPhoneAuthBtn.on('click', async function() {
-            const phone = $phoneNumberInput.val();
-            if (!phone) { // 간단한 전화번호 존재 여부 확인
-                alert('전화번호를 입력해주세요.');
+        $sendPhoneAuthBtn.on('click', async function () {
+            if (!validatePhoneNumber()) { // 전화번호 형식부터 검사
+                $phoneNumberInput.focus();
                 return;
             }
-            // TODO: 더 엄격한 전화번호 형식 유효성 검사 추가 가능
+            const phone = $phoneNumberInput.val();
             try {
                 // TODO: 실제 백엔드 전화번호 인증번호 발송 API 호출
                 $phoneAuthGroup.show();
-                $phoneAuthHelp.text('인증번호가 발송되었습니다. (임시)').removeClass('text-danger text-success').addClass('text-info');
-                alert('전화번호 인증번호 발송 (임시)');
+                if ($phoneAuthCodeHelp.length) $phoneAuthCodeHelp.text('인증번호가 발송되었습니다. (임시)').removeClass('text-danger text-success').addClass('text-info'); // 이부분도 새 ID로
+                // alert('전화번호 인증번호 발송 (임시)');
             } catch (error) {
                 console.error('전화번호 인증번호 발송 오류:', error);
-                $phoneAuthHelp.text('인증번호 발송 중 오류가 발생했습니다.').removeClass('text-info text-success').addClass('text-danger');
+                if ($phoneAuthCodeHelp.length) $phoneAuthCodeHelp.text('인증번호 발송 중 오류가 발생했습니다.').removeClass('text-info text-success').addClass('text-danger');
             }
         });
     }
 
     if ($checkPhoneAuthBtn.length) {
-        $checkPhoneAuthBtn.on('click', async function() {
-            const phone = $phoneNumberInput.val();
+        $checkPhoneAuthBtn.on('click', async function () {
+            // const phone = $phoneNumberInput.val(); // 필요시 사용
             const code = $phoneAuthCodeInput.val();
             if (!code) {
-                alert('인증번호를 입력해주세요.');
+                // alert('인증번호를 입력해주세요.');
+                if ($phoneAuthCodeHelp.length) $phoneAuthCodeHelp.text('인증번호를 입력해주세요.').removeClass('text-info text-success').addClass('text-danger');
+                $phoneAuthCodeInput.focus();
                 return;
             }
             try {
                 // TODO: 실제 백엔드 전화번호 인증번호 확인 API 호출
-                // 임시 코드
-                $phoneAuthHelp.text('전화번호 인증이 완료되었습니다. (임시)').removeClass('text-danger text-info').addClass('text-success');
+                if ($phoneAuthCodeHelp.length) $phoneAuthCodeHelp.text('전화번호 인증이 완료되었습니다. (임시)').removeClass('text-danger text-info').addClass('text-success');
                 isPhoneVerified = true;
-                alert('전화번호 인증 확인 (임시): 성공');
+                $sendPhoneAuthBtn.prop('disabled', true);
+                $checkPhoneAuthBtn.prop('disabled', true);
+                $phoneNumberInput.prop('readonly', true);
+                // alert('전화번호 인증 확인 (임시): 성공');
             } catch (error) {
                 console.error('전화번호 인증 확인 오류:', error);
-                $phoneAuthHelp.text('인증 확인 중 오류가 발생했습니다.').removeClass('text-success text-info').addClass('text-danger');
+                if ($phoneAuthCodeHelp.length) $phoneAuthCodeHelp.text('인증 확인 중 오류가 발생했습니다.').removeClass('text-info text-success').addClass('text-danger');
             }
         });
     }
@@ -238,37 +275,57 @@ $(document).ready(function () {
             const isUsernameValid = validateUsername();
             const isPasswordValid = validatePassword();
             const isPasswordConfirmValid = validatePasswordConfirm();
-            const isEmailFormatCurrentlyValid = validateEmailFormat(); // 제출 시점에서도 이메일 형식 확인
+            const isEmailCurrentlyValid = validateEmailFormat();
+            const isPhoneCurrentlyValid = validatePhoneNumber(); // 제출 시 전화번호 형식도 최종 확인
 
-            if (!isUsernameValid || !isPasswordValid || !isPasswordConfirmValid || !isEmailFormatCurrentlyValid) {
+            let finalChecksPass = true;
+            let focusTarget = null;
+
+            if (!isUsernameValid) {
+                finalChecksPass = false;
+                if (!focusTarget) focusTarget = $usernameInput;
+            }
+            if (!isPasswordValid) {
+                finalChecksPass = false;
+                if (!focusTarget) focusTarget = $passwordInput;
+            }
+            if (!isPasswordConfirmValid) {
+                finalChecksPass = false;
+                if (!focusTarget) focusTarget = $passwordConfirmInput;
+            }
+            if (!isEmailCurrentlyValid) {
+                finalChecksPass = false;
+                if (!focusTarget) focusTarget = $emailInput;
+            }
+            if (!isPhoneCurrentlyValid) { // 전화번호 형식 유효성 확인
+                finalChecksPass = false;
+                if (!focusTarget) focusTarget = $phoneNumberInput;
+            }
+
+            if (!finalChecksPass) {
                 alert('입력 정보를 다시 확인해주세요.');
-                // 어느 필드가 잘못되었는지 포커스를 줄 수도 있음
-                if (!isUsernameValid) $usernameInput.focus();
-                else if (!isPasswordValid) $passwordInput.focus();
-                else if (!isPasswordConfirmValid) $passwordConfirmInput.focus();
-                else if (!isEmailFormatCurrentlyValid) $emailInput.focus();
+                if (focusTarget) focusTarget.focus();
                 return;
             }
+
             if (!isUsernameChecked) {
                 alert('아이디 중복 확인을 해주세요.');
                 $usernameInput.focus();
                 return;
             }
-            // 이메일 인증을 필수로 할 경우 isEmailVerified 확인
-            // if (!isEmailVerified) {
+            // TODO: 이메일, 전화번호 인증 필수 여부에 따라 isEmailVerified, isPhoneVerified 조건 추가
+            // if (!isEmailVerified) { // 이메일 인증을 필수로 하는 경우
             //     alert('이메일 인증을 완료해주세요.');
             //     $emailAuthCodeInput.focus();
             //     return;
             // }
-            // 전화번호 인증을 필수로 할 경우 isPhoneVerified 확인
-            // if (!isPhoneVerified) {
+            // if (!isPhoneVerified) { // 전화번호 인증을 필수로 하는 경우
             //     alert('전화번호 인증을 완료해주세요.');
             //     $phoneAuthCodeInput.focus();
             //     return;
             // }
 
-
-            const formData = new FormData(this); // 'this'는 폼 엘리먼트
+            const formData = new FormData(this);
             const data = Object.fromEntries(formData.entries());
             console.log('제출할 데이터:', data);
 
@@ -276,14 +333,14 @@ $(document).ready(function () {
             axios.post('/api/auth/register', data)
                 .then(function (response) {
                     alert('회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.');
-                    window.location.href = '/auth/login';
+                    window.location.href = '/auth/login'; // 실제 로그인 페이지 URL로 수정
                 })
                 .catch(function (error) {
                     console.error('회원가입 오류:', error);
                     if (error.response && error.response.data && error.response.data.message) {
                         alert('회원가입 실패: ' + error.response.data.message);
                     } else {
-                        alert('회원가입 중 오류가 발생했습니다.');
+                        alert('회원가입 중 오류가 발생했습니다. 서버 로그를 확인해주세요.');
                     }
                 });
         });
@@ -293,7 +350,7 @@ $(document).ready(function () {
 // 카카오 우편번호 서비스 API 함수
 function execDaumPostcode() {
     new daum.Postcode({
-        oncomplete: function(data) {
+        oncomplete: function (data) {
             $('#postcode').val(data.zonecode);
             $('#address').val((data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress));
             $('#detailAddress').focus();

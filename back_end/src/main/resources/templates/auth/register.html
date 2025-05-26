@@ -51,7 +51,7 @@
                     <input type="email" id="email" name="email" class="form-control" placeholder="이메일 주소" required>
                     <button type="button" id="sendEmailAuthBtn" class="btn btn-outline">인증번호 발송</button>
                 </div>
-            </div>
+                <small id="emailFormatHelp" class="form-text text-muted"></small></div>
             <div class="form-group" id="emailAuthGroup" style="display: none;">
                 <label for="emailAuthCode">이메일 인증번호</label>
                 <div class="input-group">
@@ -59,9 +59,7 @@
                            placeholder="인증번호 입력">
                     <button type="button" id="checkEmailAuthBtn" class="btn btn-outline">인증 확인</button>
                 </div>
-                <small id="emailAuthHelp" class="form-text text-muted"></small>
-            </div>
-
+                <small id="emailAuthCodeHelp" class="form-text text-muted"></small></div>
 
             <div class="form-group">
                 <label for="postcode">주소</label>
@@ -85,7 +83,7 @@
                            placeholder="전화번호 (숫자만 입력)" required>
                     <button type="button" id="sendPhoneAuthBtn" class="btn btn-outline">인증번호 발송</button>
                 </div>
-            </div>
+                <small id="phoneHelp" class="form-text text-muted"></small></div>
             <div class="form-group" id="phoneAuthGroup" style="display: none;">
                 <label for="phoneAuthCode">전화번호 인증번호</label>
                 <div class="input-group">
@@ -93,8 +91,7 @@
                            placeholder="인증번호 입력">
                     <button type="button" id="checkPhoneAuthBtn" class="btn btn-outline">인증 확인</button>
                 </div>
-                <small id="phoneAuthHelp" class="form-text text-muted"></small>
-            </div>
+                <small id="phoneAuthCodeHelp" class="form-text text-muted"></small></div>
 
             <div class="form-group">
                 <button type="submit" id="registerSubmitBtn" class="btn btn-primary btn-block">가입하기</button>
@@ -106,6 +103,8 @@
         </div>
     </div>
 </div>
+
+<div th:replace="~{fragments/footer :: commonFooter}"></div>
 
 <script th:src="@{/js/auth.js}"></script>
 </body>
