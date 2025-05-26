@@ -72,6 +72,13 @@ header {
     z-index: 1000;
 }
 
+.header-logo-img {
+    height: 80px; /* 로고 높이를 30px로 설정 */
+    width: auto;  /* 높이에 맞춰 너비 자동 조절 (비율 유지) */
+    vertical-align: middle; /* 이미지가 링크 내에서 수직 중앙 정렬되도록 */
+    display: block; /* 또는 inline-block, 레이아웃에 따라 조절 */
+}
+
 header .container {
     display: flex;
     flex-direction: column; /* 타이틀과 네비게이션 바를 세로로 배치 */
@@ -176,6 +183,10 @@ footer .container a:hover {
 
 /* 반응형 처리: 모바일 화면 */
 @media (max-width: 768px) {
+    .header-logo-img {
+        height: 25px; /* 모바일에서 로고 높이 더 작게 (선택 사항) */
+    }
+
     .header-top .logo a {
         font-size: 1.8em;
     }

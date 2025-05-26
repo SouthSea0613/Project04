@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>메인 페이지 | 인테리어 플랫폼</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"> <link rel="stylesheet" th:href="@{/css/slider.css}"> </head>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/style.css}"> <link rel="stylesheet" th:href="@{/css/slider.css}">
+</head>
 <body>
 <div th:replace="~{fragments/header :: commonHeader}"></div>
 
@@ -21,12 +23,17 @@
             </div>
         </div>
     </section>
-    <div class="container page-content"> <h1>인테리어 영감을 찾으세요</h1>
-        <p>다양한 인테리어 스타일과 전문가의 포트폴리오를 탐색하고, 여러분만의 공간을 만들어보세요.</p>
+    <div class="container page-content">
+        <h1>인테리어 상담, 이제는 집에서 편하게!</h1>
+        <p>
+            복잡한 과정 없이, 내가 원하는 인테리어 견적을 간편하게 받아볼 수 있는 스마트한 인테리어 플랫폼입니다.<br>
+            불필요한 전화 스트레스 없이 집에서 편리하게 상담을 시작할 수 있어요.<br>
+            쉽고 부담 없는 인테리어 상담, 지금 우편인에서 시작해보세요!<br>
+        </p>
     </div>
 </main>
 
 <div th:replace="~{fragments/footer :: commonFooter}"></div>
-
-<script th:src="@{/js/slider.js}"></script> </body>
+<script th:src="@{/js/slider.js}"></script>
+</body>
 </html>
