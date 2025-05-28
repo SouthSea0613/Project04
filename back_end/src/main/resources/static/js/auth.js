@@ -122,7 +122,21 @@ $(document).ready(function () {
             const username = $usernameInput.val();
             try {
                 // TODO: 실제 백엔드 아이디 중복 확인 API 호출 (axios 사용)
-                $usernameHelp.text('사용 가능한 아이디입니다. (임시)').removeClass('text-danger text-muted').addClass('text-success');
+                // $usernameHelp.text('사용 가능한 아이디입니다. (임시)').removeClass('text-danger text-muted').addClass('text-success');
+                axios.post('/api/auth/check-username',{
+                    username : username
+                })
+                    .then((res)=>{
+                        console.log(res.data);
+                        if(!res.data){
+                            $usernameHelp.text("사용할 수 있는 아이디입니다.");
+                        }else{
+                            $usernameHelp.text("중복된 아이디입니다.");
+                        }
+                    })
+                    .catch((err)=>{
+                        console.log(err);
+                    })
                 isUsernameChecked = true;
             } catch (error) {
                 console.error('아이디 중복 확인 오류:', error);
@@ -240,6 +254,7 @@ $(document).ready(function () {
                 $usernameInput.focus();
                 return;
             }
+
             // 이메일 인증 필수 여부에 따라 isEmailVerified 조건 추가
             // if (!isEmailVerified) {
             //     alert('이메일 인증을 완료해주세요.');
