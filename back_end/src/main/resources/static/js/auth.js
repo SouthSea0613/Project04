@@ -100,10 +100,6 @@ $(document).ready(function () {
         return true;
     }
 
-    // 전화번호 유효성 검사 함수 삭제
-    // function validatePhoneNumber() { ... }
-
-
     // --- 이벤트 리스너 ---
     if ($usernameInput.length) {
         $usernameInput.on('input', function() {
@@ -122,6 +118,14 @@ $(document).ready(function () {
             const username = $usernameInput.val();
             try {
                 // TODO: 실제 백엔드 아이디 중복 확인 API 호출 (axios 사용)
+                // const response = await axios.get(`/api/auth/check-username?username=${username}`);
+                // if (response.data.isAvailable) {
+                //     $usernameHelp.text('사용 가능한 아이디입니다.').removeClass('text-danger text-muted').addClass('text-success');
+                //     isUsernameChecked = true;
+                // } else {
+                //     $usernameHelp.text('이미 사용 중인 아이디입니다.').removeClass('text-success text-muted').addClass('text-danger');
+                //     isUsernameChecked = false;
+                // }
                 $usernameHelp.text('사용 가능한 아이디입니다. (임시)').removeClass('text-danger text-muted').addClass('text-success');
                 isUsernameChecked = true;
             } catch (error) {
