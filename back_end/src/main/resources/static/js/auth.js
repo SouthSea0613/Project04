@@ -118,19 +118,17 @@ $(document).ready(function () {
             const username = $usernameInput.val();
             try {
                 // TODO: 실제 백엔드 아이디 중복 확인 API 호출 (axios 사용)
-                // const response = await axios.get(`/api/auth/check-username?username=${username}`);
-                // if (response.data.isAvailable) {
-                //     $usernameHelp.text('사용 가능한 아이디입니다.').removeClass('text-danger text-muted').addClass('text-success');
-                //     isUsernameChecked = true;
-                // } else {
-                //     $usernameHelp.text('이미 사용 중인 아이디입니다.').removeClass('text-success text-muted').addClass('text-danger');
-                //     isUsernameChecked = false;
-                // }
-                $usernameHelp.text('사용 가능한 아이디입니다. (임시)').removeClass('text-danger text-muted').addClass('text-success');
-                isUsernameChecked = true;
+                const response = await axios.post(`/api/auth/check-username?username=${username}`);
+                if (response.data.isAvailable) {
+                    $usernameHelp.text(response.data.message).removeClass('text-danger text-muted').addClass('text-success');
+                    isUsernameChecked = true;
+                } else {
+                    $usernameHelp.text(response.data.message).removeClass('text-success text-muted').addClass('text-danger');
+                    isUsernameChecked = false;
+                }
             } catch (error) {
                 console.error('아이디 중복 확인 오류:', error);
-                $usernameHelp.text('중복 확인 중 오류가 발생했습니다.').removeClass('text-success text-muted').addClass('text-danger');
+                $usernameHelp.text(response.data.message).removeClass('text-success text-muted').addClass('text-danger');
                 isUsernameChecked = false;
             }
         });
