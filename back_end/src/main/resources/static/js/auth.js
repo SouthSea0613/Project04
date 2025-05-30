@@ -16,11 +16,11 @@ $(document).ready(function () {
 
     const $emailInput = $('#email');
     const $sendEmailAuthBtn = $('#sendEmailAuthBtn');
-    const $emailAuthGroup = $('#emailAuthGroup');
+    const $emailAuthGroup = $('#emailAuthGroup'); // 이메일 인증번호 입력 그룹
     const $emailAuthCodeInput = $('#emailAuthCode');
     const $checkEmailAuthBtn = $('#checkEmailAuthBtn');
-    const $emailFormatHelp = $('#emailFormatHelp'); // HTML에 이 ID로 <small> 태그가 있다고 가정
-    const $emailAuthCodeHelp = $('#emailAuthCodeHelp'); // HTML에 이 ID로 <small> 태그가 있다고 가정
+    const $emailFormatHelp = $('#emailFormatHelp');
+    const $emailAuthCodeHelp = $('#emailAuthCodeHelp');
 
     const $registerSubmitBtn = $('#registerSubmitBtn');
 
@@ -117,7 +117,6 @@ $(document).ready(function () {
             }
             const username = $usernameInput.val();
             try {
-                // TODO: 실제 백엔드 아이디 중복 확인 API 호출 (axios 사용)
                 const response = await axios.post(`/api/auth/check-username?username=${username}`);
                 if (response.data.isAvailable) {
                     $usernameHelp.text(response.data.message).removeClass('text-danger text-muted').addClass('text-success');
@@ -141,19 +140,47 @@ $(document).ready(function () {
         $passwordConfirmInput.on('input', validatePasswordConfirm);
     }
 
-    if ($nameInput.length) {
-        $nameInput.on('input', validateName);
-    }
-
     if ($emailInput.length) {
         $emailInput.on('input', function() {
             validateEmailFormat();
-            isEmailVerified = false;
+            isEmailVerified = false; // 이메일 변경 시 인증 다시 필요
             if (isEmailFormatValid) {
                 if ($emailFormatHelp.length) $emailFormatHelp.text('이메일 인증을 진행해주세요.').removeClass('text-danger text-success').addClass('text-info');
             }
-            if ($emailAuthGroup.is(':visible') && $emailAuthCodeHelp.length) {
-                $emailAuthCodeHelp.text('');
+            // 이메일이 변경되면 인증번호 입력창과 메시지를 초기화/숨김 처리할 수 있습니다.
+            // if ($emailAuthGroup.is(':visible')) {
+            //     $emailAuthGroup.hide(); // 선택 사항: 이메일 변경 시 인증 필드 바로 숨기기
+            //     $emailAuthCodeInput.val('');
+            //     if ($emailAuthCodeHelp.length) $emailAuthCodeHelp.text('');
+            // }
+        });
+    }
+
+    if ($sendEmailAuthBtn.length) {
+        $sendEmailAuthBtn.on('click', async function() {
+            if (!validateEmailFormat()) { // 이메일 형식부터 검사
+                $emailInput.focus();
+                return;
+            }
+            const email = $emailInput.val();
+            // 버튼 비활성화 (중복 요청 방지)
+            $(this).prop('disabled', true).text('발송중...');
+
+            try {
+                // TODO: 실제 백엔드 이메일 인증번호 발송 API 호출 (axios 사용)
+                // const response = await axios.post('/api/auth/send-email-verification', { email: email });
+                // console.log('인증번호 발송 요청 성공:', response.data);
+
+                // 성공 시 인증번호 입력 필드 표시
+                $emailAuthGroup.slideDown(); // jQuery의 slideDown() 애니메이션으로 부드럽게 표시
+                if ($emailAuthCodeHelp.length) $emailAuthCodeHelp.text('인증번호가 발송되었습니다. 이메일을 확인해주세요. (임시)').removeClass('text-danger text-success').addClass('text-info');
+                $emailAuthCodeInput.focus(); // 인증번호 입력 필드에 포커스
+
+            } catch (error) {
+                console.error('이메일 인증번호 발송 오류:', error);
+                if ($emailAuthCodeHelp.length) $emailAuthCodeHelp.text('인증번호 발송 중 오류가 발생했습니다.').removeClass('text-info text-success').addClass('text-danger');
+                // 오류 발생 시 버튼 다시 활성화
+                $(this).prop('disabled', false).text('인증번호 발송');
             }
         });
     }
@@ -166,7 +193,6 @@ $(document).ready(function () {
             }
             const email = $emailInput.val();
             try {
-                // TODO: 실제 백엔드 이메일 인증번호 발송 API 호출
                 $emailAuthGroup.show();
                 if ($emailAuthCodeHelp.length) $emailAuthCodeHelp.text('인증번호가 발송되었습니다. 이메일을 확인해주세요. (임시)').removeClass('text-danger text-success').addClass('text-info');
             } catch (error) {
@@ -228,8 +254,6 @@ $(document).ready(function () {
             if (!isEmailCurrentlyValid) {
                 finalChecksPass = false; if (!focusTarget) focusTarget = $emailInput;
             }
-            // 전화번호 유효성 확인 로직 삭제
-            // if (!isPhoneCurrentlyValid) { ... }
 
             if (!finalChecksPass) {
                 alert('입력 정보를 다시 확인해주세요.');
@@ -242,12 +266,12 @@ $(document).ready(function () {
                 $usernameInput.focus();
                 return;
             }
-            // 이메일 인증 필수 여부에 따라 isEmailVerified 조건 추가
-            // if (!isEmailVerified) {
-            //     alert('이메일 인증을 완료해주세요.');
-            //     $emailAuthCodeInput.focus();
-            //     return;
-            // }
+
+            if (!isEmailVerified) {
+                alert('이메일 인증을 완료해주세요.');
+                $emailAuthCodeInput.focus();
+                return;
+            }
 
 
             const formData = new FormData(this);
