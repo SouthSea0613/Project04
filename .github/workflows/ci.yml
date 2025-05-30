@@ -40,7 +40,7 @@ jobs:
       run: chmod +x ./back_end/gradlew
 
     - name: Build and Test with Gradle # 4. Gradle로 빌드 및 테스트 실행
-      run: ./gradlew build
+      run: ./back_end/gradlew build
       env: # 테스트 실행 시 사용할 환경 변수 (MySQL 연결 정보)
         SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/Project04?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Seoul
         SPRING_DATASOURCE_USERNAME: Project04
