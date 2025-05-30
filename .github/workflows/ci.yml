@@ -51,7 +51,7 @@ jobs:
     # (선택 사항) 테스트 결과 리포트 업로드
     - name: Upload Test Results
       if: always() # 항상 실행 (테스트 실패 시에도 리포트 업로드)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-results
         path: build/reports/tests/test/ # Gradle 테스트 결과 기본 경로
@@ -59,7 +59,7 @@ jobs:
     # (선택 사항) 빌드된 JAR 파일 업로드 (CD 단계에서 사용하기 위함)
     - name: Upload JAR Artifact
       if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') # main 또는 develop 브랜치 푸시 시에만
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: application-jar
         path: build/libs/*.jar # Gradle 빌드 시 생성되는 JAR 파일 경로 (정확한 파일명 패턴으로 수정 가능)
