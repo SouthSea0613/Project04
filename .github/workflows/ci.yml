@@ -37,7 +37,7 @@ jobs:
         cache: 'gradle' # Gradle 의존성 캐싱
 
     - name: Setup Gradle # 3. Gradle 권한 설정 (선택 사항, gradlew 스크립트에 실행 권한 부여)
-      run: chmod +x ./gradlew
+      run: chmod +x ./back_end/gradlew
 
     - name: Build and Test with Gradle # 4. Gradle로 빌드 및 테스트 실행
       run: ./gradlew build
