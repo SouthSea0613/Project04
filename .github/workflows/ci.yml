@@ -1,0 +1,65 @@
+name: Java CI with Gradle and MySQL
+
+on:
+  push:
+    branches: [ "main", "develop" ] # main 또는 develop 브랜치에 push될 때 실행
+  pull_request:
+    branches: [ "main", "develop" ] # main 또는 develop 브랜치로 PR 생성/업데이트 시 실행
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest # 실행 환경 (Ubuntu 최신 버전)
+
+    # 서비스 컨테이너로 MySQL 실행 (테스트용 DB)
+    services:
+      mysql:
+        image: mysql:8.0 # 사용할 MySQL 이미지 버전
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword # 루트 비밀번호 설정
+          MYSQL_DATABASE: testdb # 테스트용 데이터베이스 이름
+        ports:
+          - 3306:3306 # 호스트의 3306 포트를 컨테이너의 3306 포트에 매핑
+        options: >- # MySQL 서버가 완전히 시작될 때까지 기다리는 헬스 체크 옵션
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+    - name: Checkout repository # 1. 코드 체크아웃
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17 # 2. JDK 설정 (프로젝트에 맞는 버전으로 변경)
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'gradle' # Gradle 의존성 캐싱
+
+    - name: Setup Gradle # 3. Gradle 권한 설정 (선택 사항, gradlew 스크립트에 실행 권한 부여)
+      run: chmod +x ./gradlew
+
+    - name: Build and Test with Gradle # 4. Gradle로 빌드 및 테스트 실행
+      run: ./gradlew build
+      env: # 테스트 실행 시 사용할 환경 변수 (MySQL 연결 정보)
+        SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/testdb?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Seoul
+        SPRING_DATASOURCE_USERNAME: root
+        SPRING_DATASOURCE_PASSWORD: rootpassword
+        # SPRING_JPA_HIBERNATE_DDL_AUTO: create # 테스트 시 스키마 자동 생성 (필요시)
+        # SPRING_FLYWAY_ENABLED: false # Flyway/Liquibase 사용 시 테스트에서 비활성화 또는 테스트용 설정 필요
+
+    # (선택 사항) 테스트 결과 리포트 업로드
+    - name: Upload Test Results
+      if: always() # 항상 실행 (테스트 실패 시에도 리포트 업로드)
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: build/reports/tests/test/ # Gradle 테스트 결과 기본 경로
+
+    # (선택 사항) 빌드된 JAR 파일 업로드 (CD 단계에서 사용하기 위함)
+    - name: Upload JAR Artifact
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') # main 또는 develop 브랜치 푸시 시에만
+      uses: actions/upload-artifact@v3
+      with:
+        name: application-jar
+        path: build/libs/*.jar # Gradle 빌드 시 생성되는 JAR 파일 경로 (정확한 파일명 패턴으로 수정 가능)
