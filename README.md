@@ -1,2 +1,2 @@
 # Project04
-SpringBoot(Gradle) + JQuery + Thymeleaf + MySQL + MyBatis
+SpringBoot(Gradle) + JQuery($.ajax) + Thymeleaf + MySQL + MyBatis
