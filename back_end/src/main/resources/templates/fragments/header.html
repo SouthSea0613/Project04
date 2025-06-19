@@ -29,7 +29,7 @@
                 <nav>
                     <ul>
                         <li sec:authorize="isAnonymous()"><a th:href="@{/login}">로그인</a></li>
-                        <li sec:authorize="isAnonymous()"><a th:href="@{/register}">회원가입</a></li>
+                        <li sec:authorize="isAnonymous()"><a th:href="@{/auth/register}">회원가입</a></li>
 
                         <li sec:authorize="isAuthenticated()">
                             <span sec:authentication="name" style="margin-right: 5px;"></span>님
