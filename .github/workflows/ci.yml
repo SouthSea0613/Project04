@@ -58,7 +58,7 @@ jobs:
         path: build/reports/tests/test/ # Gradle 테스트 결과 기본 경로
 
     - name: Rename JAR for deployment
-      run: mv $(find back_end/build/libs -name '*.jar') back_end/build/libs/application.jar
+      run: mv $(find back_end/build/libs -name '*.jar' -not -name '*-plain.jar') back_end/build/libs/application.jar
 
     # (선택 사항) 빌드된 JAR 파일 업로드 (CD 단계에서 사용하기 위함)
     - name: Upload JAR Artifact
