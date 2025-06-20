@@ -20,7 +20,7 @@ public class AuthApiController {
 
     @PostMapping("/check-username")
     public ResponseEntity<CheckUsernameResponseDto> checkUsername(@RequestParam String username) {
-        log.info("Checking username");
+        log.info("AuthApiController : checkUsername");
 
         if (username == null || username.trim().isEmpty()) {
             CheckUsernameResponseDto responseDto = new CheckUsernameResponseDto(false, "아이디를 입력해주세요.");

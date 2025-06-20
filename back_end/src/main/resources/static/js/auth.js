@@ -68,16 +68,22 @@ $(document).ready(function () {
         const regexEng = /^[a-zA-Z]{2,30}(?:\s[a-zA-Z]{1,30})*$/;
 
         if (!name) {
-            if ($nameHelp.length) $nameHelp.text('이름을 입력해주세요.').removeClass('text-success').addClass('text-danger');
+            if ($nameHelp.length) {
+                $nameHelp.text('이름을 입력해주세요.').removeClass('text-success').addClass('text-danger');
+            }
             isNameValid = false;
             return false;
         }
         if (!regexKor.test(name) && !regexEng.test(name)) {
-            if ($nameHelp.length) $nameHelp.text('올바른 이름 형식이 아닙니다 (한글 2~10자 또는 영문).').removeClass('text-success').addClass('text-danger');
+            if ($nameHelp.length) {
+                $nameHelp.text('올바른 이름 형식이 아닙니다 (한글 2~10자 또는 영문).').removeClass('text-success').addClass('text-danger');
+            }
             isNameValid = false;
             return false;
         }
-        if ($nameHelp.length) $nameHelp.text('').removeClass('text-danger text-success');
+        if ($nameHelp.length) {
+            $nameHelp.text('').removeClass('text-danger text-success');
+        }
         isNameValid = true;
         return true;
     }
@@ -86,16 +92,22 @@ $(document).ready(function () {
         const email = $emailInput.val();
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!email) {
-            if ($emailFormatHelp.length) $emailFormatHelp.text('이메일을 입력해주세요.').removeClass('text-success text-info').addClass('text-danger');
+            if ($emailFormatHelp.length) {
+                $emailFormatHelp.text('이메일을 입력해주세요.').removeClass('text-success text-info').addClass('text-danger');
+            }
             isEmailFormatValid = false;
             return false;
         }
         if (!regex.test(email)) {
-            if ($emailFormatHelp.length) $emailFormatHelp.text('올바른 이메일 형식이 아닙니다 (예: user@example.com).').removeClass('text-success text-info').addClass('text-danger');
+            if ($emailFormatHelp.length) {
+                $emailFormatHelp.text('올바른 이메일 형식이 아닙니다 (예: user@example.com).').removeClass('text-success text-info').addClass('text-danger');
+            }
             isEmailFormatValid = false;
             return false;
         }
-        if ($emailFormatHelp.length) $emailFormatHelp.text('').removeClass('text-danger text-success text-info');
+        if ($emailFormatHelp.length) {
+            $emailFormatHelp.text('').removeClass('text-danger text-success text-info');
+        }
         isEmailFormatValid = true;
         return true;
     }
@@ -116,20 +128,35 @@ $(document).ready(function () {
                 return;
             }
             const username = $usernameInput.val();
-            try {
-                const response = await axios.post(`/api/auth/check-username?username=${username}`);
-                if (response.data.isAvailable) {
-                    $usernameHelp.text(response.data.message).removeClass('text-danger text-muted').addClass('text-success');
-                    isUsernameChecked = true;
-                } else {
-                    $usernameHelp.text(response.data.message).removeClass('text-success text-muted').addClass('text-danger');
+            $.ajax({
+                url: `/api/auth/check-username`, // 요청을 보낼 URL
+                type: 'POST', // HTTP 요청 방식
+                data: { // 서버로 보낼 데이터
+                    username: username
+                },
+                // HTTP 요청 성공 시 실행될 콜백 함수
+                success: function(response) {
+                    if (response.isAvailable) {
+                        $usernameHelp.text(response.message).removeClass('text-danger text-muted').addClass('text-success');
+                        isUsernameChecked = true;
+                    } else {
+                        $usernameHelp.text(response.message).removeClass('text-success text-muted').addClass('text-danger');
+                        isUsernameChecked = false;
+                    }
+                },
+                // HTTP 요청 실패 시 실행될 콜백 함수
+                error: function(error) {
+                    console.error('아이디 중복 확인 오류:', error);
+                    const response = error.responseJSON; // 실패 시 응답 데이터
+                    if (response && response.message) {
+                        $usernameHelp.text(response.message).removeClass('text-success text-muted').addClass('text-danger');
+                    }
+                    else {
+                        $usernameHelp.text('아이디 중복 확인 중 오류가 발생했습니다.').removeClass('text-success text-muted').addClass('text-danger');
+                    }
                     isUsernameChecked = false;
                 }
-            } catch (error) {
-                console.error('아이디 중복 확인 오류:', error);
-                $usernameHelp.text(response.data.message).removeClass('text-success text-muted').addClass('text-danger');
-                isUsernameChecked = false;
-            }
+            });
         });
     }
 
@@ -145,7 +172,9 @@ $(document).ready(function () {
             validateEmailFormat();
             isEmailVerified = false; // 이메일 변경 시 인증 다시 필요
             if (isEmailFormatValid) {
-                if ($emailFormatHelp.length) $emailFormatHelp.text('이메일 인증을 진행해주세요.').removeClass('text-danger text-success').addClass('text-info');
+                if ($emailFormatHelp.length) {
+                    $emailFormatHelp.text('이메일 인증을 진행해주세요.').removeClass('text-danger text-success').addClass('text-info');
+                }
             }
             // 이메일이 변경되면 인증번호 입력창과 메시지를 초기화/숨김 처리할 수 있습니다.
             // if ($emailAuthGroup.is(':visible')) {
@@ -167,18 +196,23 @@ $(document).ready(function () {
             $(this).prop('disabled', true).text('발송중...');
 
             try {
-                // TODO: 실제 백엔드 이메일 인증번호 발송 API 호출 (axios 사용)
+                // TODO: 실제 백엔드 이메일 인증번호 발송 API 호출 ($.ajax 사용)
                 // const response = await axios.post('/api/auth/send-email-verification', { email: email });
                 // console.log('인증번호 발송 요청 성공:', response.data);
 
                 // 성공 시 인증번호 입력 필드 표시
                 $emailAuthGroup.slideDown(); // jQuery의 slideDown() 애니메이션으로 부드럽게 표시
-                if ($emailAuthCodeHelp.length) $emailAuthCodeHelp.text('인증번호가 발송되었습니다. 이메일을 확인해주세요. (임시)').removeClass('text-danger text-success').addClass('text-info');
+                if ($emailAuthCodeHelp.length) {
+                    $emailAuthCodeHelp.text('인증번호가 발송되었습니다. 이메일을 확인해주세요. (임시)').removeClass('text-danger text-success').addClass('text-info');
+                }
                 $emailAuthCodeInput.focus(); // 인증번호 입력 필드에 포커스
 
-            } catch (error) {
+            }
+            catch (error) {
                 console.error('이메일 인증번호 발송 오류:', error);
-                if ($emailAuthCodeHelp.length) $emailAuthCodeHelp.text('인증번호 발송 중 오류가 발생했습니다.').removeClass('text-info text-success').addClass('text-danger');
+                if ($emailAuthCodeHelp.length) {
+                    $emailAuthCodeHelp.text('인증번호 발송 중 오류가 발생했습니다.').removeClass('text-info text-success').addClass('text-danger');
+                }
                 // 오류 발생 시 버튼 다시 활성화
                 $(this).prop('disabled', false).text('인증번호 발송');
             }
@@ -194,10 +228,15 @@ $(document).ready(function () {
             const email = $emailInput.val();
             try {
                 $emailAuthGroup.show();
-                if ($emailAuthCodeHelp.length) $emailAuthCodeHelp.text('인증번호가 발송되었습니다. 이메일을 확인해주세요. (임시)').removeClass('text-danger text-success').addClass('text-info');
-            } catch (error) {
+                if ($emailAuthCodeHelp.length) {
+                    $emailAuthCodeHelp.text('인증번호가 발송되었습니다. 이메일을 확인해주세요. (임시)').removeClass('text-danger text-success').addClass('text-info');
+                }
+            }
+            catch (error) {
                 console.error('이메일 인증번호 발송 오류:', error);
-                if ($emailAuthCodeHelp.length) $emailAuthCodeHelp.text('인증번호 발송 중 오류가 발생했습니다.').removeClass('text-info text-success').addClass('text-danger');
+                if ($emailAuthCodeHelp.length) {
+                    $emailAuthCodeHelp.text('인증번호 발송 중 오류가 발생했습니다.').removeClass('text-info text-success').addClass('text-danger');
+                }
             }
         });
     }
@@ -207,20 +246,27 @@ $(document).ready(function () {
             const email = $emailInput.val();
             const code = $emailAuthCodeInput.val();
             if (!code) {
-                if ($emailAuthCodeHelp.length) $emailAuthCodeHelp.text('인증번호를 입력해주세요.').removeClass('text-info text-success').addClass('text-danger');
+                if ($emailAuthCodeHelp.length) {
+                    $emailAuthCodeHelp.text('인증번호를 입력해주세요.').removeClass('text-info text-success').addClass('text-danger');
+                }
                 $emailAuthCodeInput.focus();
                 return;
             }
             try {
                 // TODO: 실제 백엔드 이메일 인증번호 확인 API 호출
-                if ($emailAuthCodeHelp.length) $emailAuthCodeHelp.text('이메일 인증이 완료되었습니다. (임시)').removeClass('text-danger text-info').addClass('text-success');
+                if ($emailAuthCodeHelp.length) {
+                    $emailAuthCodeHelp.text('이메일 인증이 완료되었습니다. (임시)').removeClass('text-danger text-info').addClass('text-success');
+                }
                 isEmailVerified = true;
                 $sendEmailAuthBtn.prop('disabled', true);
                 $checkEmailAuthBtn.prop('disabled', true);
                 $emailInput.prop('readonly', true);
-            } catch (error) {
+            }
+            catch (error) {
                 console.error('이메일 인증 확인 오류:', error);
-                if ($emailAuthCodeHelp.length) $emailAuthCodeHelp.text('인증 확인 중 오류가 발생했습니다.').removeClass('text-info text-success').addClass('text-danger');
+                if ($emailAuthCodeHelp.length) {
+                    $emailAuthCodeHelp.text('인증 확인 중 오류가 발생했습니다.').removeClass('text-info text-success').addClass('text-danger');
+                }
             }
         });
     }
@@ -240,24 +286,41 @@ $(document).ready(function () {
             let focusTarget = null;
 
             if (!isUsernameValid) {
-                finalChecksPass = false; if (!focusTarget) focusTarget = $usernameInput;
+                finalChecksPass = false;
+                if (!focusTarget) {
+                    focusTarget = $usernameInput;
+                }
             }
             if (!isPasswordValid) {
-                finalChecksPass = false; if (!focusTarget) focusTarget = $passwordInput;
+                finalChecksPass = false;
+                if (!focusTarget) {
+                    focusTarget = $passwordInput;
+                }
             }
             if (!isPasswordConfirmValid) {
-                finalChecksPass = false; if (!focusTarget) focusTarget = $passwordConfirmInput;
+                finalChecksPass = false;
+                if (!focusTarget) {
+                    focusTarget = $passwordConfirmInput;
+                }
             }
             if (!isCurrentNameValid) {
-                finalChecksPass = false; if (!focusTarget) focusTarget = $nameInput;
+                finalChecksPass = false;
+                if (!focusTarget) {
+                    focusTarget = $nameInput;
+                }
             }
             if (!isEmailCurrentlyValid) {
-                finalChecksPass = false; if (!focusTarget) focusTarget = $emailInput;
+                finalChecksPass = false;
+                if (!focusTarget) {
+                    focusTarget = $emailInput;
+                }
             }
 
             if (!finalChecksPass) {
                 alert('입력 정보를 다시 확인해주세요.');
-                if (focusTarget) focusTarget.focus();
+                if (focusTarget) {
+                    focusTarget.focus();
+                }
                 return;
             }
 
@@ -278,20 +341,27 @@ $(document).ready(function () {
             const data = Object.fromEntries(formData.entries()); // 'phoneNumber' 관련 필드는 이제 포함되지 않음
             console.log('제출할 데이터:', data);
 
-            // TODO: 실제 백엔드 회원가입 API 호출 (axios 사용)
-            axios.post('/api/auth/register', data)
-                .then(function (response) {
+            // TODO: 실제 백엔드 회원가입 API 호출 ($.ajax 사용)
+            $.ajax({
+                url: '/api/auth/register', // 회원가입 API 엔드포인트
+                type: 'POST',
+                contentType: 'application/json', // 서버로 보낼 데이터 타입
+                data: JSON.stringify(data), // JavaScript 객체를 JSON 문자열로 변환
+                success: function(response) {
                     alert('회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.');
-                    window.location.href = '/auth/login'; // 실제 로그인 페이지 URL로 수정
-                })
-                .catch(function (error) {
+                    window.location.href = '/login'; // 로그인 페이지 URL
+                },
+                error: function(error) {
                     console.error('회원가입 오류:', error);
-                    if (error.response && error.response.data && error.response.data.message) {
-                        alert('회원가입 실패: ' + error.response.data.message);
-                    } else {
-                        alert('회원가입 중 오류가 발생했습니다. 서버 로그를 확인해주세요.');
+                    // 서버에서 보낸 에러 메시지가 있는 경우 표시
+                    if (error.responseJSON && error.responseJSON.message) {
+                        alert('회원가입 실패: ' + error.responseJSON.message);
                     }
-                });
+                    else {
+                        alert('회원가입 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+                    }
+                }
+            });
         });
     }
 });
@@ -306,13 +376,13 @@ function execDaumPostcode() {
 
             var extraAddr = '';
             if(data.userSelectedType === 'R'){
-                if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
                     extraAddr += data.bname;
                 }
-                if(data.buildingName !== '' && data.apartment === 'Y'){
+                if(data.buildingName !== '' && data.apartment === 'Y') {
                     extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
                 }
-                if(extraAddr !== ''){
+                if(extraAddr !== '') {
                     extraAddr = ' (' + extraAddr + ')';
                 }
             }

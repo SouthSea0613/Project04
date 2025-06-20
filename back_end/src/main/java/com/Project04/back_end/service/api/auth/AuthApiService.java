@@ -12,6 +12,7 @@ public class AuthApiService {
     public final AuthApiMapper authApiMapper;
 
     public boolean checkUsername(String username) {
+        log.info("AuthApiController : checkUsername");
         return !authApiMapper.checkUsername(username);
     }
 }
