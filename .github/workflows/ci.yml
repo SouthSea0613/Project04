@@ -63,7 +63,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: application-jar
-        path: build/libs/*.jar # Gradle 빌드 시 생성되는 JAR 파일 경로 (정확한 파일명 패턴으로 수정 가능)
+        path: back_end/build/libs/*.jar # Gradle 빌드 시 생성되는 JAR 파일 경로 (정확한 파일명 패턴으로 수정 가능)
 
   eploy:
     needs: build-and-test # build-and-test 작업이 성공해야 실행됩니다.
