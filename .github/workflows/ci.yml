@@ -57,13 +57,16 @@ jobs:
         name: test-results
         path: build/reports/tests/test/ # Gradle 테스트 결과 기본 경로
 
+    - name: Rename JAR for deployment
+      run: mv $(find back_end/build/libs -name '*.jar') back_end/build/libs/application.jar
+
     # (선택 사항) 빌드된 JAR 파일 업로드 (CD 단계에서 사용하기 위함)
     - name: Upload JAR Artifact
-      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') # main 또는 develop 브랜치 푸시 시에만
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
       uses: actions/upload-artifact@v4
       with:
         name: application-jar
-        path: back_end/build/libs/*.jar # Gradle 빌드 시 생성되는 JAR 파일 경로 (정확한 파일명 패턴으로 수정 가능)
+        path: back_end/build/libs/application.jar # *.jar 대신 고정된 이름 사용
 
   eploy:
     needs: build-and-test # build-and-test 작업이 성공해야 실행됩니다.
@@ -92,4 +95,4 @@ jobs:
         environment_name: Project04-env # Elastic Beanstalk 환경 이름
         region: ap-northeast-2                   # 본인의 AWS 리전
         version_label: "v${{ github.sha }}"       # 배포 버전 레이블 (고유해야 함)
-        deployment_package: "*.jar"              # 다운로드한 아티팩트(JAR 파일)
+        deployment_package: application.jar # *.jar 대신 고정된 이름 사용
