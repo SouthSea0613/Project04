@@ -94,5 +94,5 @@ jobs:
         application_name: Project04       # Elastic Beanstalk 애플리케이션 이름
         environment_name: Project04-env # Elastic Beanstalk 환경 이름
         region: ap-northeast-2                   # 본인의 AWS 리전
-        version_label: "v${{ github.sha }}"       # 배포 버전 레이블 (고유해야 함)
+        version_label: "v${{ github.sha }}-${{ github.run_number }}"
         deployment_package: application.jar # *.jar 대신 고정된 이름 사용
