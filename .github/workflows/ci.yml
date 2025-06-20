@@ -86,13 +86,17 @@ jobs:
       with:
         name: application-jar
 
+    - name: Generate timestamp
+      id: timestamp
+      run: echo "value=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
+
     - name: Deploy to AWS Elastic Beanstalk
       uses: einaregilsson/beanstalk-deploy@v22
       with:
         aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        application_name: Project04       # Elastic Beanstalk 애플리케이션 이름
-        environment_name: Project04-env # Elastic Beanstalk 환경 이름
-        region: ap-northeast-2                   # 본인의 AWS 리전
-        version_label: "v${{ github.sha }}-${{ github.run_number }}"
-        deployment_package: application.jar # *.jar 대신 고정된 이름 사용
+        application_name: Project04
+        environment_name: Project04-env
+        region: ap-northeast-2
+        version_label: "v${{ github.sha }}-${{ steps.timestamp.outputs.value }}" # 타임스탬프 사용
+        deployment_package: application.jar
