@@ -17,8 +17,7 @@ public class RegisterController {
     }
 
     @PostMapping("/register")
-    public String register(@RequestBody UserDto userDto) {
-        // 뭘 해야하지
+    public String register(UserDto userDto) {
         return "auth/login";
     }
 }
